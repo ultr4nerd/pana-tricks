@@ -1,10 +1,10 @@
 {
   "id": "com.mauricio.trick-updater",
   "name": "Actualizador de tricks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "icon": "hugeicons:refresh",
   "app_support_dir": "com.mauricio.trick-updater",
-  "description": "Busca y aplica actualizaciones de tricks instalados desde GitHub (campo source en su manifest)",
+  "description": "Instala tricks desde un link, los mantiene al día y publica los tuyos para compartir",
   "source": {
     "repo": "ultr4nerd/pana-tricks",
     "path": "trick-updater",
@@ -20,12 +20,37 @@
     "self_update": {
       "schema": {},
       "handler": "scripts/on_self_update.sh"
+    },
+    "install": {
+      "schema": {
+        "url": "string"
+      },
+      "handler": "scripts/on_install.sh"
+    },
+    "set_mode": {
+      "schema": {
+        "id": "string",
+        "mode": "string"
+      },
+      "handler": "scripts/on_set_mode.sh"
+    },
+    "publish": {
+      "schema": {
+        "id": "string",
+        "bump": "string"
+      },
+      "handler": "scripts/on_publish.sh"
     }
   },
   "queries": {
     "check": {
       "params": {},
       "handler": "scripts/query_check.sh",
+      "returns": "object"
+    },
+    "state": {
+      "params": {},
+      "handler": "scripts/query_state.sh",
       "returns": "object"
     }
   }

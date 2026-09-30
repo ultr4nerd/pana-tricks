@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Actualizador de tricks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+<style>
+:root{
+  --color-ink:#0E0F0C; --color-parchment:#EEEEEE; --color-graphite:#3A3D38;
+  --color-bone:#DDE8EF; --color-muted:#7A7A6E; --color-signal:#2F80ED;
+  --color-deep:#123B5D; --color-green:#2F6F5E; --color-danger:#B91C1C;
+  --color-select:#D3E2FB;
+  --font-display:"Libre Caslon Text",Georgia,ui-serif,serif;
+  --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Inter,ui-sans-serif,system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace;
+  --border-hairline:1px solid rgba(var(--ink-rgb),.15);
+  --border-soft:1px solid rgba(var(--ink-rgb),.10);
+  --glass-bg:rgba(var(--parchment-rgb),.72);
+  --focus-ring:0 0 0 2px var(--color-parchment),0 0 0 4px var(--color-signal);
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+  --ease-commit:cubic-bezier(.65,0,.1,1);
+  --radius-md:8px; --radius-lg:12px; --radius-full:999px;
+  --sidebar-w:236px;
+  /* Channel lists so the translucent layers can follow the theme. */
+  --ink-rgb:14,15,12; --parchment-rgb:238,238,238; --bone-rgb:221,232,239;
+  --graphite-rgb:58,61,56; --muted-rgb:122,122,110;
+  --danger-rgb:185,28,28; --signal-rgb:47,128,237;
+  --scrim:rgba(var(--ink-rgb),.28);
+  /* Surfaces lift toward white on parchment and toward white on ink too: a
+     touch of white is what reads as "raised" in both themes. */
+  --lift:#fff;
+  /* --color-deep fills solid accent buttons (white text on top); --accent-fg
+     is the same accent used as text, which needs to lift in dark. */
+  --accent-fg:var(--color-deep);
+}
+
+    /* Dark theme. This GUI is a cross-document iframe with its own copy of
+       the tokens, so the app's cascade cannot reach it; the values match
+       com.turbo.settings and the app's theme.css. Set by the boot script
+       from ?theme=, updated by postMessage. */
+    :root[data-theme="dark"]{
+      color-scheme: dark;
+      --ink-rgb:232,230,223; --parchment-rgb:26,27,23; --bone-rgb:40,42,37;
+      --graphite-rgb:185,183,174; --muted-rgb:150,148,138;
+      --danger-rgb:233,115,107; --signal-rgb:111,168,220;
+      --scrim:rgba(0,0,0,.62);
+      /* Surfaces still lift toward light, but a white lift on near-black reads
+         as washed grey, so the dark lift is a muted grey instead. */
+      --lift:#8A8C84;
+      --accent-fg:var(--color-signal);
+      --color-ink:#E8E6DF; --color-parchment:#1A1B17; --color-graphite:#B9B7AE;
+      --color-bone:#282A25; --color-muted:#96948A;
+      --color-signal:#6FA8DC; --color-green:#6FBFA5; --color-danger:#E9736B;
+      /* --color-deep backs the solid accent buttons that keep white text, so
+         it only lifts enough to read against the dark surfaces. */
+      --color-deep:#2B5F8F;
+      --color-select:#2C3E55;
+    }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-parchment);color:var(--color-ink);font-family:var(--font-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;padding:0}
+input,select{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+section{margin-bottom:32px}
+h2{font-family:var(--font-display);font-weight:400;font-size:20px;margin:0 0 4px}
+.sub{color:var(--color-muted);font-size:13px;margin:0 0 12px}
+.group{border:var(--border-hairline);border-radius:var(--radius-lg);background:rgba(var(--bone-rgb),.22);overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:56px}
+.row+.row{border-top:var(--border-soft)}
+.row.stack{flex-wrap:wrap}
+.copy{flex:1;min-width:0}
+.title{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta{font-family:var(--font-mono);font-size:12px;color:var(--color-muted);margin-top:2px}
+.meta b{font-weight:500;color:var(--accent-fg)}
+.err{color:var(--color-danger)}
+.field{flex:1;min-width:0;height:44px;padding:0 14px;border-radius:var(--radius-md);border:var(--border-hairline);background:var(--color-parchment);outline:none}
+.field:focus{box-shadow:var(--focus-ring)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:var(--radius-full);font-size:14px;font-weight:500;white-space:nowrap;transition:background 160ms var(--ease-out),opacity 160ms}
+.btn:focus-visible{box-shadow:var(--focus-ring)}
+.btn.primary{background:var(--color-deep);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border:var(--border-hairline)}
+.btn.ghost:hover{background:rgba(var(--ink-rgb),.055)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.seg{display:inline-flex;border:var(--border-hairline);border-radius:var(--radius-full);padding:2px;gap:2px}
+.seg button{height:34px;padding:0 12px;border-radius:var(--radius-full);font-size:13px;color:var(--color-graphite)}
+.seg button[aria-pressed="true"]{background:rgba(var(--ink-rgb),.09);color:var(--color-ink);font-weight:500}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.installbar{display:flex;gap:8px}
+.note{font-size:13px;margin-top:8px;min-height:18px;color:var(--color-graphite)}
+.note.bad{color:var(--color-danger)}
+.empty{padding:16px 14px;color:var(--color-muted);font-size:14px}
+select.field{height:40px;flex:0 0 auto;padding:0 10px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--color-ink);color:var(--color-parchment);padding:10px 16px;border-radius:var(--radius-full);font-size:14px;opacity:0;transition:opacity 200ms;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+@media (max-width:520px){
+  .row.stack .actions{width:100%}
+  .installbar{flex-direction:column}
+  .installbar .btn{width:100%;height:44px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section>
+    <h2>Instalar desde un link</h2>
+    <p class="sub">Pega el link que te compartieron.</p>
+    <form class="installbar" id="installForm">
+      <input class="field" id="url" type="url" inputmode="url" autocomplete="off" placeholder="https://github.com/…/tree/…" aria-label="Link del trick">
+      <button class="btn primary" id="installBtn" type="submit"><span class="iconify icon" data-icon="hugeicons:download-04"></span>Instalar</button>
+    </form>
+    <div class="note" id="installNote" role="status"></div>
+  </section>
+
+  <section>
+    <h2>Tus tricks instalados desde un link</h2>
+    <p class="sub">Reviso versiones nuevas cada mañana. Elige si te aviso o si lo actualizo solo.</p>
+    <div class="group" id="list"><div class="empty">Revisando versiones…</div></div>
+  </section>
+
+  <section id="pubSection" hidden>
+    <h2>Compartir tus tricks</h2>
+    <p class="sub" id="pubSub"></p>
+    <div class="group" id="pubList"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+import { Trick } from '{{CP_BASE_URL}}/sdk/trick.v3.js';
+const trick = Trick({ id: 'com.mauricio.trick-updater' });
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S = null;
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('on'),2600); }
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){ const a=document.createElement('textarea'); a.value=text; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); }
+  toast('Link copiado');
+}
+async function send(evt, payload){
+  const r = await trick.sendEvent(evt, payload);
+  if(!r || r.ok === false) throw new Error((r && r.error) || 'Algo salió mal');
+  return r;
+}
+async function load(){
+  const r = await trick.query('state');
+  if(!r || r.ok === false) throw new Error((r && r.error) || 'No pude leer el estado');
+  S = r; render();
+}
+
+function render(){
+  const list = $('#list');
+  const items = S.tricks || [];
+  if(!items.length){ list.innerHTML = '<div class="empty">Todavía no tienes tricks instalados desde un link.</div>'; }
+  else list.innerHTML = items.map(t => {
+    const ver = t.error ? `<span class="err">No pude revisar: ${esc(t.error)}</span>`
+      : t.update ? `Tienes ${esc(t.installed)} · hay <b>${esc(t.latest)}</b>`
+      : `${esc(t.installed)} · al día`;
+    return `<div class="row stack" data-id="${esc(t.id)}">
+      <div class="copy"><div class="title">${esc(t.name || t.id)}</div><div class="meta">${ver}</div></div>
+      <div class="actions">
+        <div class="seg" role="group" aria-label="Cuando haya versión nueva">
+          <button data-mode="notify" aria-pressed="${t.mode!=='auto'}">Avisarme</button>
+          <button data-mode="auto" aria-pressed="${t.mode==='auto'}">Actualizar solo</button>
+        </div>
+        ${t.update ? `<button class="btn primary" data-act="apply">Actualizar</button>` : ''}
+      </div></div>`;
+  }).join('');
+
+  const pub = S.publisher;
+  $('#pubSection').hidden = !pub;
+  if(pub){
+    $('#pubSub').textContent = `Publica una versión nueva en ${pub.repo} y comparte el link.`;
+    $('#pubList').innerHTML = pub.tricks.map(t => `<div class="row stack" data-id="${esc(t.id)}">
+      <div class="copy"><div class="title">${esc(t.name)}</div>
+        <div class="meta">${t.version ? esc(t.version) : 'sin versión'}${t.link ? ' · publicado' : ''}</div></div>
+      <div class="actions">
+        <select class="field" data-bump aria-label="Tipo de cambio">
+          <option value="patch">Arreglo</option><option value="minor">Función nueva</option>
+        </select>
+        <button class="btn ghost" data-act="publish"><span class="iconify icon" data-icon="hugeicons:upload-04"></span>Publicar</button>
+        ${t.link ? `<button class="btn ghost" data-act="copy" data-link="${esc(t.link)}"><span class="iconify icon" data-icon="hugeicons:copy-01"></span>Copiar link</button>` : ''}
+      </div></div>`).join('');
+  }
+}
+
+$('#installForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const url = $('#url').value.trim(); const note = $('#installNote'); const b = $('#installBtn');
+  if(!url){ note.className='note bad'; note.textContent='Pega un link primero.'; return; }
+  b.disabled = true; note.className='note'; note.textContent='Instalando…';
+  try{
+    const r = await send('install', { url });
+    note.textContent = r.replaced ? `Listo: ${r.name} pasó de ${r.replaced} a ${r.version}.` : `Listo: ${r.name} ${r.version} ya está en tus tricks.`;
+    $('#url').value = ''; await load();
+  }catch(err){ note.className='note bad'; note.textContent = err.message; }
+  b.disabled = false;
+});
+
+document.addEventListener('click', async e => {
+  const btn = e.target.closest('button'); if(!btn) return;
+  const row = btn.closest('[data-id]'); if(!row) return;
+  const id = row.dataset.id;
+  try{
+    if(btn.dataset.mode){
+      row.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === btn));
+      await send('set_mode', { id, mode: btn.dataset.mode });
+      toast(btn.dataset.mode === 'auto' ? 'Lo actualizaré solo' : 'Te avisaré antes de actualizar');
+      const t = S.tricks.find(x => x.id === id); if(t) t.mode = btn.dataset.mode;
+    } else if(btn.dataset.act === 'apply'){
+      btn.disabled = true; btn.textContent = 'Actualizando…';
+      const r = await send('apply', { id });
+      toast(r.updated ? `Actualizado a ${r.to}` : 'Ya estaba al día'); await load();
+    } else if(btn.dataset.act === 'publish'){
+      const bump = row.querySelector('[data-bump]').value;
+      btn.disabled = true; btn.textContent = 'Publicando…';
+      const r = await send('publish', { id, bump });
+      await load(); await copy(r.link); toast(`Publiqué ${r.version} y copié el link`);
+    } else if(btn.dataset.act === 'copy'){
+      await copy(btn.dataset.link);
+    }
+  }catch(err){ toast(err.message); load().catch(()=>{}); }
+});
+
+load().catch(err => { $('#list').innerHTML = `<div class="empty err">${esc(err.message)}</div>`; });
+</script>
+<script>
+function applyTheme(theme){ document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light'); }
+(function bootTheme(){
+  let t = new URLSearchParams(location.search).get('theme');
+  if (t !== 'light' && t !== 'dark') t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  applyTheme(t);
+  window.addEventListener('message', ev => { if (ev && ev.data && ev.data.type === 'pana:theme') applyTheme(ev.data.theme); });
+  try { parent.postMessage({ type: 'pana:theme-request' }, '*'); } catch (e) {}
+})();
+</script>
+</body>
+</html>

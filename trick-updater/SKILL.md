@@ -1,16 +1,21 @@
 ---
 name: Actualizador de tricks
-description: Revisa (a diario, solo) y aplica actualizaciones de tricks instalados desde GitHub. Úsalo cuando llegue un aviso "[trick-updater]", o cuando el boss pregunte por versiones nuevas o pida actualizar un trick.
+description: Instala tricks desde un link compartido, los revisa a diario y los actualiza (avisando o solo), y publica tricks propios para compartir. Úsalo cuando llegue un aviso "[trick-updater]", cuando el boss pegue un link github.com/.../tree/<carpeta>-v<versión>/<carpeta>, pregunte por versiones nuevas, pida actualizar o compartir un trick.
 ---
 # Actualizador de tricks
-Aplica a todo trick en ~/tricks/ cuyo manifest.json tenga `"source": {"repo":"owner/name","path":"carpeta","tag_prefix":"carpeta-v"}` y un `version` semver.
-- `GET localhost:8443/tricks/com.mauricio.trick-updater/_api/queries/check` → `{tricks:[{id,installed,latest,update}]}` (API pública de GitHub, sin token).
-- `POST .../_api/events/apply {"id":"<trick-id>"}` → descarga la carpeta en el tag nuevo, reemplaza la carpeta del trick (respaldo + rollback si install.sh falla), corre install.sh y refresh-tricks.sh.
-- `POST .../_api/events/self_update {}` → actualiza el propio actualizador (equivale a apply con su id).
+Funciona con todo trick en ~/tricks/ cuyo manifest.json tenga `"source": {"repo":"owner/name","path":"carpeta","tag_prefix":"carpeta-v"}` y `version` semver. Tiene pantalla propia (instalar, lista con Actualizar y Avisarme/Actualizar solo, y Compartir si este Pana puede publicar).
 
-## Aviso automático
-install.sh deja un cron diario (~10:00 hora del boss, según TIMEZONE en ~/.env) que corre `bin/cron.sh`. Si un trick tiene versión nueva que no se ha avisado antes, despierta a tu Pana con un mensaje que empieza con `[trick-updater]` e incluye versión y cambios. Se avisa una sola vez por versión (estado en ~/app_support/com.mauricio.trick-updater/notified.json).
+API (`localhost:8443/tricks/com.mauricio.trick-updater/_api/...`):
+- `GET queries/state` → `{tricks:[{id,name,installed,latest,update,mode,link}], publisher:{repo,tricks:[...]}|null}`. `queries/check` sigue igual.
+- `POST events/install {"url":"https://github.com/<repo>/tree/<carpeta>-v<x.y.z>/<carpeta>"}` → baja esa carpeta en ese tag a ~/tricks/<id>, le escribe `source`, corre install.sh y refresh-tricks.sh. Si ya existía, la reemplaza (con rollback) y no toca ~/app_support/<id>/.
+- `POST events/apply {"id":"<trick-id>"}` → actualiza a la última versión. `events/self_update {}` = apply del propio actualizador.
+- `POST events/set_mode {"id":"<trick-id>","mode":"notify"|"auto"}` → guarda en ~/app_support/com.mauricio.trick-updater/prefs.json.
+- `POST events/publish {"id":"<trick-id>","bump":"patch"|"minor"}` → solo si existe publish.json (abajo). Escanea credenciales (rechaza si encuentra), copia la carpeta sin .env/bases/logs/app_support al clon, sube versión en ambos manifests, commit, tag `<carpeta>-v<versión>`, push. Devuelve `link` para compartir.
 
-**Al recibir ese aviso:** dile al boss en UNA línea qué trick tiene versión nueva y qué cambió, y pregúntale si lo actualizas. Aplica (`apply`) SOLO después de que el boss diga que sí. Si no responde o dice que no, no hagas nada.
+## Aviso diario
+Cron ~10:00 hora del boss corre `bin/cron.sh`. Por trick con versión nueva:
+- modo `notify` (default): te despierta una vez por versión con `[trick-updater] Hay versión nueva…`. Dile al boss en UNA línea qué cambió y pregunta si actualizas. `apply` SOLO si dice que sí.
+- modo `auto`: aplica solo y te despierta con `[trick-updater] Actualicé solo…`. Díselo al boss en una línea, sin preguntar.
 
-Nunca toca ~/app_support/<id>/ (los datos del boss).
+## Publicar (opcional)
+`~/app_support/com.mauricio.trick-updater/publish.json`: `{"repo","clone","branch","token_file","token_key","author_name","author_email"}`. El token se lee de `token_file` al vuelo; nunca se escribe en el repo ni en el remoto guardado.
