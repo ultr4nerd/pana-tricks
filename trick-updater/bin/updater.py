@@ -5,6 +5,9 @@ import sys, os, json, re, io, shutil, tarfile, tempfile, subprocess, urllib.requ
 HOME = os.environ.get("MANO_USER_DIR", os.path.expanduser("~"))
 TRICKS = os.path.join(HOME, "tricks")
 REFRESH = "/opt/mano/system/scripts/refresh-tricks.sh"
+APP = os.path.join(HOME, "app_support", "com.mauricio.trick-updater")
+STATE = os.path.join(APP, "notified.json")
+SELF = "com.mauricio.trick-updater"
 UA = {"user-agent": "pana-trick-updater", "accept": "application/vnd.github+json"}
 
 def out(o): print(json.dumps(o, ensure_ascii=False)); sys.exit(0)
@@ -88,8 +91,59 @@ def apply(tid):
     if os.path.exists(REFRESH): subprocess.run(["bash", REFRESH], capture_output=True, timeout=60)
     out({"ok": True, "updated": True, "id": info["id"], "from": info["installed"], "to": new.get("version")})
 
+def changes(s, old_tag, new_tag):
+    """Mensajes de release/commits entre el tag instalado y el nuevo (API pública de GitHub)."""
+    notes = []
+    try:
+        r = json.loads(get(f"https://api.github.com/repos/{s['repo']}/releases/tags/{new_tag}"))
+        if r.get("body"): notes.append(r["body"].strip())
+    except Exception: pass
+    if not notes and old_tag:
+        try:
+            c = json.loads(get(f"https://api.github.com/repos/{s['repo']}/compare/{old_tag}...{new_tag}"))
+            path = s["path"].strip("/")
+            for cm in c.get("commits", []):
+                msg = cm["commit"]["message"].split("\n")[0]
+                notes.append("- " + msg)
+        except Exception: pass
+    return "\n".join(notes)[:600] or "(sin notas)"
+
+def notify_agent(msg):
+    body = json.dumps({"msg": msg[:900], "spawn_session": True}).encode()
+    last = None
+    for port in [os.environ.get("WEBHOOK_PORT"), "8443", "8080"]:
+        if not port: continue
+        try:
+            req = urllib.request.Request(f"http://localhost:{port}/tricks/{SELF}/_api/notify", data=body,
+                                         method="POST", headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=10) as r:
+                if r.status < 300: return True
+        except Exception as e: last = e
+    raise RuntimeError(f"notify failed: {last}")
+
+def auto():
+    """Corre desde cron: avisa una sola vez por versión nueva de cada trick."""
+    os.makedirs(APP, exist_ok=True)
+    try: state = json.load(open(STATE))
+    except Exception: state = {}
+    sent = []
+    for i in check():
+        if not i.get("update") or state.get(i["id"]) == i["latest"]: continue
+        s = json.load(open(os.path.join(TRICKS, i["dir"], "manifest.json")))["source"]
+        notes = changes(s, s["tag_prefix"] + str(i["installed"]), i["tag"])
+        msg = (f"[trick-updater] Hay versión nueva del trick «{i.get('name') or i['id']}» ({i['id']}): "
+               f"{i['installed']} → {i['latest']}.\nCambios:\n{notes}\n"
+               f"Dile al boss en una línea qué cambió y pregúntale si lo actualizas. SOLO si dice que sí: "
+               f"POST localhost:8443/tricks/{SELF}/_api/events/apply {{\"id\":\"{i['id']}\"}}")
+        notify_agent(msg)
+        state[i["id"]] = i["latest"]; sent.append(i["id"])
+        json.dump(state, open(STATE, "w"), indent=1)
+    out({"ok": True, "notified": sent})
+
 if __name__ == "__main__":
     if sys.argv[1] == "check": out({"ok": True, "tricks": check()})
+    if sys.argv[1] == "auto": auto()
+    if sys.argv[1] == "self_update": apply(SELF)
     tid = os.environ.get("TRICK_PAYLOAD_ID", "")
     try: tid = json.loads(tid) if tid.startswith('"') else tid
     except Exception: pass
