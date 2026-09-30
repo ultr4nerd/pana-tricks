@@ -6,7 +6,11 @@
   "app_support_dir": "com.mauricio.super-compartido",
   "color": "watercolor",
   "description": "Lista de súper compartida entre dos o más Panas, con código para unirse",
-  "source": "https://github.com/ultr4nerd/pana-tricks",
+  "source": {
+    "repo": "ultr4nerd/pana-tricks",
+    "path": "super-compartido",
+    "tag_prefix": "super-compartido-v"
+  },
   "events": {
     "create_list": {
       "schema": {
