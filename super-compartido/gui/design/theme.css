@@ -1,0 +1,755 @@
+/* Trick SDK theme v1: fonts, tokens, light/dark themes and shared components.
+   Compatible changes stay on v1; breaking style changes require a new major. */
+/* Fonts extracted unchanged from the supplied PACO proposal. */
+/* PACO foundations. Public token names shared by the app and trick UIs. */
+:root {
+  color-scheme: light;
+  --paper: #F9F8F6;
+  --cream: #F2F0EC;
+  --ink: #1B2330;
+  --deep: #2E5C8A;
+  --sky: #6B99C6;
+  --stone: #A9A79E;
+  --maroon: #5B2230;
+  --brick: #9D3432;
+  --clay: #D3746E;
+  --ochre: #D9A44D;
+  --moss: #3E7045;
+  --sage: #80A86F;
+  /* Neutral contrast for the close glyph, independent of the glass tint. */
+  --paco-media-control-fg: #fff;
+  --paco-media-control-contrast: grayscale(1) contrast(1000) invert(1);
+  --paco-media-close-shape: polygon(23% 18%, 50% 45%, 77% 18%, 82% 23%, 55% 50%, 82% 77%, 77% 82%, 50% 55%, 23% 82%, 18% 77%, 45% 50%, 18% 23%);
+  --font-display: 'Zodiak', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --theme-bg: var(--paper);
+  --theme-surface: var(--cream);
+  --theme-text: var(--ink);
+  --theme-text-secondary: #60656D;
+  --theme-text-muted: #60656D;
+  --theme-text-faint: #60656D;
+  --theme-border: rgb(27 35 48 / 10%);
+  --theme-action: var(--ink);
+  --theme-action-fg: var(--paper);
+  --theme-action-hover: var(--deep);
+  --theme-action-accent: var(--deep);
+  --theme-danger: var(--brick);
+  --theme-success: var(--moss);
+  --paco-status-inactive: #D4D4D0;
+  --control-hover-bg: var(--cream);
+  --control-pressed-bg: color-mix(in srgb, var(--theme-text) 10%, var(--control-hover-bg));
+  --control-selected-bg: #E2EAF1;
+  /* Strong selection follows the active theme, with a contrasting foreground. */
+  --control-selected-strong-bg: var(--deep);
+  --control-selected-strong-fg: var(--paper);
+  --liquid-tinted-sheen: linear-gradient(145deg, rgb(255 255 255 / 10%), transparent 55%);
+  --entry-fill: #FFF;
+  --entry-disabled: #F0F1F2;
+  --form-edge: rgb(27 35 48 / 16%);
+  --form-focus: #2C5A86;
+  --form-focus-halo: rgb(46 92 138 / 10%);
+  --form-on: #2E5C8A;
+  --form-off: #D9DDE1;
+  --presentation-fill: #FCFCFB;
+  --presentation-edge: rgb(27 35 48 / 9%);
+  --presentation-shadow: 0 24px 80px rgb(27 35 48 / 16%);
+  --liquid-fill: rgb(255 255 255 / 66%);
+  --liquid-edge: rgb(255 255 255 / 82%);
+  --liquid-shadow: 0 2px 5px rgb(27 35 48 / 2.5%), 0 12px 32px rgb(27 35 48 / 9%);
+  --liquid-sheen: linear-gradient(145deg, rgb(255 255 255 / 42%), rgb(255 255 255 / 4%) 55%, rgb(255 255 255 / 16%));
+  --liquid-inset: inset 0 1px 0 rgb(255 255 255 / 95%), inset 0 -1px 0 rgb(27 35 48 / 3.5%);
+  --toast-bg: var(--ink);
+  --toast-fg: var(--paper);
+  --ds-muted: var(--theme-text-muted);
+  --ds-border: var(--theme-border);
+  --ds-action-radius: 999px;
+  --paco-space-1: 4px;
+  --paco-space-2: 8px;
+  --paco-space-3: 12px;
+  --paco-space-4: 16px;
+  --paco-space-6: 24px;
+  --paco-space-8: 32px;
+  --paco-space-12: 48px;
+  --paco-radius-inset-field: 9px;
+  --paco-provider-size: 40px;
+  --paco-radius-mark: 11px;
+  --paco-mark-edge: color-mix(in srgb, var(--theme-text) 6%, transparent);
+  --paco-dialog-scrim: rgb(27 35 48 / 24%);
+  --paco-skeleton-fill: color-mix(in srgb, var(--theme-text) 8%, var(--entry-fill));
+  --paco-radius-skeleton: 6px;
+  --paco-radius-field: 14px;
+  --paco-radius-group: 20px;
+  --paco-radius-dialog: 28px;
+  /* Shared semantic type roles. Relative units respect the browser root size;
+     hosts may set --paco-text-scale per document for an app text-size preference. */
+  --paco-text-scale: 1;
+  --paco-text-body: calc(.875rem * var(--paco-text-scale));
+  --paco-text-message: calc(.9375rem * var(--paco-text-scale));
+  --paco-leading-message: 1.4;
+  --paco-text-supporting: calc(.75rem * var(--paco-text-scale));
+  --paco-text-caption: calc(.75rem * var(--paco-text-scale));
+  --paco-text-title: calc(2.25rem * var(--paco-text-scale));
+  --paco-text-heading: calc(1.25rem * var(--paco-text-scale));
+  --paco-text-dialog-title: calc(1.4375rem * var(--paco-text-scale));
+  --paco-row-height: 48px;
+  --paco-row-padding-block: 4px;
+  --paco-control-height: 44px;
+  --paco-hit-target: 44px;
+  --paco-screen-control-inset: 12px;
+  --paco-ease: cubic-bezier(.2, .8, .2, 1);
+}
+:root[data-theme=dark] {
+  --paco-status-inactive: #8A827A;
+  color-scheme: dark;
+  /* Warm foundations also tint decorative washes and media controls. */
+  --ink: #262422;
+  --paper: #F3EADF;
+  --cream: #322F2C;
+  --deep: #9EC0E0;
+  --sky: #9EC0E0;
+  --control-selected-strong-bg: #9EC0E0;
+  --control-selected-strong-fg: #262422;
+  --theme-bg: #262422;
+  --theme-surface: #322F2C;
+  --theme-text: #F3EADF;
+  --theme-text-secondary: #BFB6AB;
+  --theme-text-muted: #BFB6AB;
+  --theme-text-faint: #BFB6AB;
+  --theme-border: rgb(243 234 223 / 22%);
+  --theme-action: #9EC0E0;
+  --theme-action-fg: #262422;
+  --theme-action-hover: #AFCBE6;
+  --theme-action-accent: #9EC0E0;
+  --theme-danger: #E3918A;
+  --theme-success: #A4C49A;
+  --control-hover-bg: #322F2C;
+  --control-selected-bg: #45403A;
+  --entry-fill: #3B3834;
+  --entry-disabled: #2C2A27;
+  --form-edge: rgb(243 234 223 / 18%);
+  --form-focus: #9EC0E0;
+  --form-focus-halo: rgb(158 192 224 / 12%);
+  --form-on: #9EC0E0;
+  --form-off: #5E5750;
+  --presentation-fill: #322F2C;
+  --presentation-edge: rgb(243 234 223 / 12%);
+  --presentation-shadow: 0 24px 80px rgb(0 0 0 / 35%);
+  --liquid-fill: rgb(59 56 52 / 72%);
+  --liquid-edge: rgb(243 234 223 / 18%);
+  --liquid-sheen: linear-gradient(145deg, rgb(243 234 223 / 9%), transparent 55%, rgb(243 234 223 / 2.5%));
+  --liquid-inset: inset 0 1px 0 rgb(243 234 223 / 24%), inset 0 -1px 0 rgb(0 0 0 / 12%);
+  --liquid-shadow: 0 2px 5px rgb(0 0 0 / 10%), 0 12px 32px rgb(0 0 0 / 26%);
+  --paco-dialog-scrim: rgb(0 0 0 / 55%);
+  --toast-bg: #F3EADF;
+  --toast-fg: #262422;
+}
+
+/* Shared component styles. Screen layout belongs to the consuming app. */
+/* Four independent material layers. Set data-glass-{pane,bevel,lift,refraction}
+   to "off" on a surface or ancestor. Geometry remains owned by each consumer. */
+:root {
+  /* The dock reference keeps detail visible through a milky, lightly blurred
+     pane. The highlight has thickness; a uniform outline alone looks flat. */
+  --glass-pane-fill: rgba(255,255,255,.42);
+  --glass-pane-filter: blur(3px) saturate(150%);
+  --glass-bevel: inset 1px 1px 0 rgba(255,255,255,.6),
+    inset -1px -1px 0 rgba(255,255,255,.3);
+  --glass-border: rgba(255,255,255,.24);
+  /* Broad, diffuse lift separates the pane without a hard contact edge. */
+  --glass-lift: 0 4px 24px -3px rgba(0,0,0,.12);
+}
+:root[data-theme="dark"] {
+  --glass-pane-fill: rgba(35,42,48,.38);
+  --glass-bevel: inset 1px 1px 0 rgba(255,255,255,.32),
+    inset -1px -1px 0 rgba(255,255,255,.16);
+  --glass-border: rgba(255,255,255,.16);
+  --glass-lift: 0 4px 24px -3px rgba(0,0,0,.20);
+}
+/* Clear photo controls retain the backdrop's color in either app theme. */
+[data-glass-finish="clear"] {
+  --glass-pane-fill: rgba(255,255,255,.08);
+}
+/* Optional original frosted finish, independent of the four layer switches. */
+[data-glass-finish="frosted"] {
+  --glass-pane-fill: rgba(255,255,255,.12);
+  --glass-pane-filter: blur(20px) saturate(180%);
+}
+/* Reading surfaces: obscure underlying text while retaining a glass edge.
+   Search opts into this finish; floating controls retain the clear material. */
+[data-glass-finish="matte"] {
+  --glass-pane-fill: rgba(255,255,255,.72);
+  --glass-pane-filter: blur(18px) saturate(115%);
+  --glass-bevel: inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -1px 0 rgba(0,0,0,.04);
+  --glass-border: color-mix(in srgb, var(--theme-text) 8%, transparent);
+}
+:root[data-theme="dark"] [data-glass-finish="matte"] {
+  --glass-pane-fill: color-mix(in srgb, var(--theme-surface) 84%, transparent);
+}
+[data-glass-pane="off"], [data-glass-pane="off"] * {
+  --glass-pane-fill: transparent !important;
+  --glass-pane-filter: opacity(1) !important;
+}
+[data-glass-bevel="off"], [data-glass-bevel="off"] * {
+  --glass-bevel: inset 0 0 0 transparent !important;
+  --glass-border: transparent !important;
+}
+[data-glass-lift="off"], [data-glass-lift="off"] * { --glass-lift: 0 0 0 transparent !important; }
+:root .paco-button.glass-control,
+.paco-glass.paco-glass:not(.paco-composer),
+.paco-composer .tstrip .chip,
+.paco-composer::before,
+#topic-jump.tjump {
+  background: var(--glass-pane-fill) !important;
+  border: 1px solid var(--glass-border);
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-bevel), var(--glass-lift);
+  -webkit-backdrop-filter: var(--glass-pane-filter);
+  backdrop-filter: var(--glass-pane-filter);
+}
+/* Preserve topic selection contrast while sharing the material at rest. */
+.paco-composer .tstrip .chip:is(.active, .hl) {
+  --glass-pane-fill: var(--control-selected-strong-bg);
+}
+/* Only installed by glass.js on engines that render SVG backdrop filters.
+   Refract the blurred backdrop last to preserve the shape of the curved edge. */
+:root .paco-button.glass-control,
+.paco-glass.paco-glass:not(.paco-composer),
+.paco-composer .tstrip .chip,
+.paco-composer::before,
+#topic-jump.tjump {
+  -webkit-backdrop-filter: var(--glass-pane-filter) var(--glass-refraction-filter, opacity(1));
+  backdrop-filter: var(--glass-pane-filter) var(--glass-refraction-filter, opacity(1));
+}
+[data-glass-refraction="off"], [data-glass-refraction="off"] * {
+  --glass-refraction-filter: opacity(1) !important;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+:root .paco-button.glass-control,
+.paco-glass.paco-glass:not(.paco-composer),
+.paco-composer .tstrip .chip,
+.paco-composer::before,
+#topic-jump.tjump { background: var(--theme-surface) !important; }
+}
+@media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
+:root .paco-button.glass-control,
+.paco-glass.paco-glass:not(.paco-composer),
+.paco-composer .tstrip .chip,
+.paco-composer::before,
+#topic-jump.tjump {
+    background: var(--theme-surface) !important;
+    border-color: var(--ds-border) !important;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Opt-in press feedback for glass controls with host-owned geometry.
+   Use scale separately so a host's slide-in transform remains intact. */
+.paco-glass-press {
+  scale: 1;
+  transition: scale 140ms var(--paco-ease);
+}
+@media (prefers-reduced-motion:no-preference) {
+  .paco-glass-press:active:not(:disabled):not(:focus-visible) { scale: 1.12; }
+}
+@media (pointer:coarse) and (prefers-reduced-motion:no-preference) {
+  .paco-glass-press:active:not(:disabled):not(:focus-visible) { scale: 1.18; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .paco-glass-press { transition: none; }
+}
+
+
+/* Explicit opt-in classes: no resets or selectors for unrelated app controls.
+   :root gives migrated catalog controls precedence over its legacy demo CSS. */
+:root .paco-button {
+  box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--paco-control-height); padding: 10px 20px;
+  border: 1px solid transparent; border-radius: var(--ds-action-radius);
+  background: var(--theme-surface); color: var(--theme-text);
+  font: 500 var(--paco-text-body)/1.25 var(--font-body); text-decoration: none;
+  cursor: pointer; touch-action: manipulation;
+  transition: background 140ms ease, transform 140ms var(--paco-ease);
+}
+:root .paco-button.primary { background: var(--theme-action); color: var(--theme-action-fg); }
+:root .paco-button.ghost { background: transparent; }
+/* Keep the glass and glyph as siblings so each can sample the image backdrop. */
+:root .media-control-surface {
+  width: var(--paco-hit-target); height: var(--paco-hit-target);
+  box-sizing: border-box; border-radius: 50%; pointer-events: none;
+}
+:root .paco-button.media-control {
+  color: var(--theme-text);
+  background: transparent;
+  border-color: transparent;
+}
+@supports ((backdrop-filter: invert(1)) or (-webkit-backdrop-filter: invert(1))) and (clip-path: polygon(0 0, 100% 0, 50% 100%)) {
+  :root .paco-button.media-control.adaptive-close svg { visibility: hidden; }
+  :root .paco-button.media-control.adaptive-close::after {
+    content: ''; position: absolute; width: 20px; height: 20px;
+    pointer-events: none;
+    /* Threshold only the X-shaped area; the glass remains full color. */
+    -webkit-backdrop-filter: var(--paco-media-control-contrast);
+    backdrop-filter: var(--paco-media-control-contrast);
+    clip-path: var(--paco-media-close-shape);
+  }
+}
+:root .paco-button.danger { background: var(--theme-danger); color: #fff; }
+:root[data-theme=dark] .paco-button.danger { color: var(--ink); }
+:root .paco-button.small { min-height: var(--paco-control-height); padding: 8px 16px; }
+/* Inline row actions retain the row's type scale and a full touch target. */
+:root .paco-button.row-action {
+  min-height: var(--paco-hit-target); padding: 8px 10px;
+  background: transparent; color: var(--theme-action-accent);
+  font: 400 var(--paco-text-body)/1.4 var(--font-body); white-space: nowrap;
+}
+:root .paco-button.large { min-height: var(--paco-control-height); padding: 10px 20px; }
+:root .paco-button.icon { width: var(--paco-hit-target); height: var(--paco-hit-target); min-height: var(--paco-hit-target); flex: 0 0 var(--paco-hit-target); padding: 0; border-radius: 50%; }
+:root .paco-button.icon :is(svg, .icon) { width: 20px; height: 20px; }
+:root .paco-button:disabled { opacity: .45; cursor: default; transform: none; }
+:root .paco-button:active:not(:disabled) { transform: scale(.98); }
+@media (hover:hover) and (pointer:fine) {
+  :root .paco-button:hover:not(:disabled) { background: color-mix(in srgb, var(--theme-text) 8%, var(--theme-surface)); }
+  :root .paco-button.primary:hover:not(:disabled) { background: var(--theme-action-hover); }
+  :root .paco-button.media-control:hover:not(:disabled) { background: transparent; }
+  :root .paco-button.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--theme-danger) 90%, var(--ink)); }
+}
+
+:root .paco-group {
+  background: var(--entry-fill); border: 0; border-radius: var(--paco-radius-group);
+  padding: 0; overflow: hidden; box-shadow: none;
+}
+:root .paco-row {
+  box-sizing: border-box; position: relative; display: flex; align-items: center; justify-content: space-between;
+  gap: var(--paco-space-3); min-height: var(--paco-row-height); padding: var(--paco-row-padding-block) 16px;
+  border: 0; color: var(--theme-text); font: 400 var(--paco-text-body)/1.4 var(--font-body);
+}
+:root .paco-row + .paco-row::before {
+  content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px; background: var(--ds-border);
+}
+:root .paco-row:has(.paco-field:focus) { background: color-mix(in srgb, var(--form-focus) 3%, var(--entry-fill)); }
+:root .paco-label { font: 500 var(--paco-text-supporting)/1.45 var(--font-body); color: var(--ds-muted); }
+:root .paco-field {
+  box-sizing: border-box; max-width: 100%;
+  display: block; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px;
+  border: 0; border-radius: var(--paco-radius-field); background: var(--entry-fill);
+  color: var(--theme-text); font: 400 var(--paco-text-body)/1.5 var(--font-body);
+}
+:root .paco-field:disabled { background: var(--entry-disabled); opacity: .65; }
+:root .paco-field[readonly] { background: color-mix(in srgb, var(--entry-fill) 70%, var(--theme-surface)); }
+/* Native controls keep their native behavior. The embedded dropdown chevron
+   matches the Mage icon-chevron-down symbol in frontend/www/index.html.
+   Search clear uses https://api.iconify.design/hugeicons/cancel-01.svg */
+:root { --paco-select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%2360656D%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M4%208.41693L10.5866%2015.0037C10.9633%2015.375%2011.471%2015.5831%2012%2015.5831C12.529%2015.5831%2013.0367%2015.375%2013.4134%2015.0037L20%208.41693%22%2F%3E%3C%2Fsvg%3E"); }
+:root[data-theme="dark"] { --paco-select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23BFB6AB%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M4%208.41693L10.5866%2015.0037C10.9633%2015.375%2011.471%2015.5831%2012%2015.5831C12.529%2015.5831%2013.0367%2015.375%2013.4134%2015.0037L20%208.41693%22%2F%3E%3C%2Fsvg%3E"); }
+/* Older markup may keep this wrapper, but it no longer paints a second icon. */
+:root .paco-select { display: block; width: 100%; min-width: 0; }
+:root select.paco-field:not([multiple]):is(:not([size]),[size="0"],[size="1"]) {
+  appearance: none; -webkit-appearance: none; padding-inline-end: 56px;
+  background-image: var(--paco-select-chevron); background-repeat: no-repeat;
+  background-size: 24px 24px; background-position: right 16px center;
+  cursor: pointer;
+}
+:root select.paco-field:dir(rtl) { background-position: left 16px center; }
+:root select.paco-field:disabled { cursor: default; }
+/* Style the browser's working search-clear control, not a decorative fake X.
+   Negative margins retain the field height while giving the control a 44px target. */
+:root input.paco-field[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none; appearance: none;
+  width: 44px; height: 44px; margin-block: -10px; margin-inline: 0 -10px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M18%206L6%2018m12%200L6%206%22%2F%3E%3C%2Fsvg%3E") center / 24px 24px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22M18%206L6%2018m12%200L6%206%22%2F%3E%3C%2Fsvg%3E") center / 24px 24px no-repeat;
+  cursor: pointer;
+}
+@media (forced-colors: active) {
+  :root select.paco-field:not([multiple]) { appearance: auto; background-image: none; }
+  :root input.paco-field[type="search"]::-webkit-search-cancel-button {
+    background-color: CanvasText; forced-color-adjust: none;
+  }
+}
+
+:root .paco-field-frame {
+  box-sizing: border-box; min-width: 0; max-width: 100%;
+  display: flex; align-items: center; min-height: 52px; border: 1px solid var(--form-edge);
+  border-radius: var(--paco-radius-field); background: var(--entry-fill); box-shadow: none;
+}
+:root .paco-field-frame :is(input,textarea) { box-sizing: border-box; min-width: 0; width: 100%; background: transparent; color: var(--theme-text); border: 0; padding: 13px 15px; font: 400 var(--paco-text-body)/1.5 var(--font-body); }
+:root .paco-field-frame:focus-within { outline: 2px solid var(--form-focus); outline-offset: -2px; box-shadow: 0 0 0 3px var(--form-focus-halo); }
+:root .paco-field-frame :is(input,textarea):focus { outline: none; box-shadow: none; }
+:root .paco-switch {
+  appearance: none; position: relative; display: inline-block; flex: none;
+  width: 52px !important; height: 32px !important; padding: 0; margin: 0;
+  border: 0; border-radius: 99px; background: var(--form-off); cursor: pointer;
+  box-shadow: inset 0 1px 2px rgb(27 35 48 / 8%); transition: background 140ms ease;
+}
+:root .paco-switch::before {
+  content: ''; position: absolute; width: 26px; height: 26px; top: 3px; left: 3px;
+  border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(27 35 48 / 19%);
+  transition: transform 140ms var(--paco-ease);
+}
+:root .paco-switch:checked { background: var(--form-on); }
+:root[data-theme=dark] .paco-switch:checked::before { background: var(--theme-bg); }
+:root .paco-switch:checked::before { left: 3px; transform: translateX(20px); }
+:root .paco-switch:disabled { opacity: .45; cursor: default; }
+:root .paco-choice {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  min-height: var(--paco-row-height); padding: var(--paco-row-padding-block) 16px; border: 0; border-radius: 0;
+  background: transparent; color: var(--theme-text); text-align: left;
+  font: 400 var(--paco-text-body)/1.4 var(--font-body); cursor: pointer;
+  transition: none; transform: none;
+}
+:root .paco-choice::after { content: ''; margin-left: auto; width: 24px; height: 24px; border: 0; transform: none; visibility: hidden; flex-shrink: 0; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 13l4 4L19 6' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+:root .paco-choice:is(.active,[aria-pressed=true])::after { visibility: visible; }
+:root .paco-group-footer { margin: 10px 16px 0; color: var(--ds-muted); font: 400 var(--paco-text-supporting)/1.5 var(--font-body); }
+:root .paco-section-title { text-transform: uppercase; letter-spacing: .09em; font: 500 var(--paco-text-caption)/1.5 var(--font-mono); color: var(--ds-muted); }
+:root .paco-badge { display: inline-flex; align-items: center; gap: 6px; font: 400 var(--paco-text-caption)/1.4 var(--font-mono); color: var(--ds-muted); white-space: nowrap; text-transform: uppercase; letter-spacing: .04em; }
+:root .paco-listbox {
+  position: fixed; z-index: 110; display: none; max-height: min(280px, 45dvh); overflow: auto;
+  padding: 6px; border: 1px solid var(--ds-border); border-radius: var(--paco-radius-field);
+  background: var(--presentation-fill); color: var(--theme-text); box-shadow: var(--presentation-shadow);
+}
+:root .paco-listbox.open { display: block; }
+:root .paco-listbox-option { padding: 12px; min-height: 44px; border-radius: 8px; font: 400 var(--paco-text-body)/1.4 var(--font-body); cursor: pointer; overflow-wrap: anywhere; }
+:root .paco-listbox-option:is(:hover,.active,[aria-selected=true]) { background: var(--control-selected-bg); }
+/* Dialog dimensions include padding, even without a consumer's global reset.
+   Descendants keep full-width fields inside the dialog's equal side gutters. */
+:root :is(.paco-dialog,.paco-sheet),
+:root :is(.paco-dialog,.paco-sheet) *,
+:root :is(.paco-dialog,.paco-sheet) *::before,
+:root :is(.paco-dialog,.paco-sheet) *::after { box-sizing: border-box; }
+:root .paco-dialog {
+  position: fixed; inset: 0; margin: auto; height: fit-content;
+  width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow: auto;
+  padding: 28px; border: 1px solid var(--presentation-edge); border-radius: var(--paco-radius-dialog);
+  background: var(--theme-surface); color: var(--theme-text); box-shadow: var(--presentation-shadow);
+  font: 400 var(--paco-text-body)/1.5 var(--font-body);
+}
+:root .paco-dialog::backdrop { background: var(--paco-dialog-scrim); }
+:root :is(.paco-button,.paco-choice,.paco-field,.paco-switch):focus-visible { outline: 2px solid var(--theme-action-accent); outline-offset: -2px; }
+:root .paco-button.media-control:focus-visible { outline-color: var(--paco-media-control-fg); }
+:root .paco-switch:focus-visible { outline-offset: 3px; }
+:root[data-input-modality=keyboard] .paco-button { transition: none; }
+:root[data-input-modality=keyboard] .paco-button:active:not(:disabled) { transform: none; }
+@media (prefers-reduced-motion:no-preference) {
+  :root .paco-button.glass-control:active:not(:disabled):not(:focus-visible) { transform: scale(1.12); }
+}
+@media (pointer:coarse) and (prefers-reduced-motion:no-preference) {
+  :root .paco-button.glass-control:active:not(:disabled):not(:focus-visible) { transform: scale(1.18); }
+}
+@media (prefers-reduced-motion:reduce) {
+  :root .paco-button, :root .paco-switch, :root .paco-switch::before { transition: none; }
+  :root .paco-button:active:not(:disabled) { transform: none; }
+}
+@media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
+  :root .paco-button.media-control {
+    color: var(--theme-text);
+  }
+  :root .paco-button.media-control.adaptive-close svg { visibility: visible; }
+  :root .paco-button.media-control.adaptive-close::after { display: none; }
+  :root .paco-button.glass-control { background: var(--theme-surface) !important; border-color: var(--ds-border); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (prefers-contrast:more) {
+  :root .paco-group, :root .paco-field, :root .paco-switch { outline: 1px solid var(--theme-text); outline-offset: -1px; }
+}
+
+/* Quiet, centered guidance for an empty group. */
+:root .paco-empty-state { padding: 24px; text-align: center; color: var(--ds-muted); font: 400 var(--paco-text-body)/1.4 var(--font-body); }
+:root .paco-empty-state p { margin: 0; }
+:root .paco-empty-state p + p { margin-top: 4px; font-size: var(--paco-text-supporting); }
+:root .paco-empty-state p:first-child { color: var(--theme-text); }
+
+/* Searchable selection: anchored desktop dialog, mobile bottom sheet. */
+:root .paco-picker { position: fixed; inset: auto; top: var(--picker-top, 16px); left: var(--picker-left, 16px); width: min(360px, calc(100vw - 32px)); max-width: none; max-height: var(--picker-height, 440px); margin: 0; padding: 16px; overflow: hidden; border: 1px solid var(--presentation-edge); border-radius: 20px; background: var(--presentation-fill); color: var(--theme-text); box-shadow: var(--presentation-shadow); font: 400 var(--paco-text-body)/1.4 var(--font-body); }
+:root .paco-picker[open] { display: flex; flex-direction: column; }
+:root .paco-picker::backdrop { background: rgb(27 35 48 / 12%); }
+:root .paco-picker-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; flex: none; }
+:root .paco-picker-header h2 { margin: 0; font: 500 var(--paco-text-body)/1.4 var(--font-body); }
+:root .paco-picker-header .paco-button { min-height: 44px; padding: 8px 12px; color: var(--theme-action-accent); }
+:root .paco-picker > :last-child { display: flex; flex-direction: column; min-height: 0; }
+:root .paco-picker .paco-field { flex: none; }
+:root .paco-picker .paco-listbox { position: static; flex: 1; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; border: 0; box-shadow: none; padding: 4px 0 0; margin-top: 8px; }
+:root .paco-picker .paco-listbox-option { font-size: var(--paco-text-body); }
+@media(max-width:600px) {
+  :root .paco-picker { top: auto; left: 0; bottom: var(--picker-viewport-bottom, 0px); width: 100%; max-height: min(var(--picker-height, 440px), 80dvh); border-radius: 24px 24px 0 0; padding: 16px 16px max(16px, env(safe-area-inset-bottom)); }
+  :root .paco-picker::backdrop { background: rgb(27 35 48 / 28%); }
+}
+
+/* Pair with an accessible status label; the consumer supplies semantic color. */
+:root .paco-status-dot { display: inline-block; width: .5rem; height: .5rem; flex: 0 0 .5rem; border-radius: 50%; background: currentColor; }
+
+/* A single native button owns the whole cell hit area and keyboard focus. */
+:root .paco-action-cell .row-action { position: static; background: transparent; transform: none; }
+:root .paco-action-cell .row-action::after { content: ''; position: absolute; inset: 0; cursor: pointer; }
+:root .paco-action-cell .row-action:disabled::after { cursor: default; }
+:root .paco-action-cell .row-action:focus-visible { outline: none; }
+:root .paco-action-cell:has(.row-action:focus-visible) { outline: 2px solid var(--theme-action-accent); outline-offset: -2px; }
+@media(hover:hover) and (pointer:fine) {
+  :root .paco-choice:hover:not(:disabled) { background: var(--control-selected-bg); }
+  :root .paco-action-cell:has(.row-action:hover:not(:disabled)) { background: var(--control-hover-bg); }
+  :root .paco-action-cell .row-action:hover:not(:disabled) { background: transparent; }
+}
+
+/* Choice rows stay stationary, including when composed with button styles.
+   The checkmark alone indicates selection; hover is only temporary feedback. */
+:root .paco-choice:active:not(:disabled) { transform: none; }
+
+/* Action cells retain their separate pressed feedback. */
+:root .paco-action-cell:has(.row-action:active:not(:disabled)) { background: var(--control-pressed-bg); }
+
+/* Extracted from the PACO proposal; catalog and consumers share this surface. */
+:root .paco-toast { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; border-radius: 16px; background: var(--toast-bg); color: var(--toast-fg); padding: 14px 18px; max-width: min(90vw, 560px); z-index: 1100; box-shadow: 0 8px 28px #0002; font: 400 var(--paco-text-body)/1.4 var(--font-body); }
+:root .paco-toast-label { min-width: 0; overflow-wrap: anywhere; }
+:root .paco-toast-icon { width: 20px; height: 20px; flex: 0 0 20px; }
+:root .paco-toast button { flex-shrink: 0; }
+:root .paco-toast:empty, :root .paco-toast[hidden] { display: none; }
+:root .paco-toast button { display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; color: inherit; font: 600 var(--paco-text-body)/1.4 var(--font-body); min-height: var(--paco-hit-target); min-width: var(--paco-hit-target); padding: 8px; cursor: pointer; }
+:root .paco-toast button:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+
+/* Cell compositions: reuse these instead of screen-specific control skins. */
+:root .paco-choice + .paco-choice::before { content: ''; position: absolute; top: 0; left: var(--paco-space-4); right: var(--paco-space-4); height: 1px; background: var(--ds-border); }
+:root .paco-provider-mark { display: grid; place-items: center; width: var(--paco-provider-size); height: var(--paco-provider-size); flex: 0 0 var(--paco-provider-size); border-radius: var(--paco-radius-mark); background: var(--theme-bg); border: 1px solid var(--paco-mark-edge); }
+:root .paco-provider-mark svg { width: 24px; height: 24px; }
+:root .paco-value-trigger { display: flex; align-items: center; gap: var(--paco-space-2); padding: 0; min-height: var(--paco-hit-target); min-width: 0; border: 0; background: transparent; color: var(--ds-muted); font: 400 var(--paco-text-body)/1.4 var(--font-body); cursor: pointer; }
+:root .paco-value-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:root .paco-value-trigger svg { width: 18px; height: 18px; flex: none; }
+:root .paco-value-trigger:focus-visible { outline: 2px solid var(--theme-action-accent); outline-offset: 4px; border-radius: 4px; }
+:root .paco-time-field { width: calc(8.125rem * var(--paco-text-scale)); max-width: 100%; min-height: var(--paco-hit-target); padding: 6px 10px; text-align: center; font: 400 var(--paco-text-body)/1.4 var(--font-body); font-variant-numeric: tabular-nums; background: var(--theme-bg); border-radius: var(--paco-radius-inset-field); }
+/* Keep inline keyboard editing; omit the browser clock/dropdown affordance. */
+:root .paco-time-field::-webkit-calendar-picker-indicator { display: none; }
+:root .paco-picker .paco-field { text-align: left; padding: 10px 12px; background: var(--theme-bg); }
+:root .paco-listbox-empty { padding: var(--paco-space-3); font-size: var(--paco-text-supporting); color: var(--ds-muted); }
+:root .paco-tone-success { color: var(--theme-success); }
+
+/* Shared legacy-overlay presentation; native dialogs use the same contents. */
+:root .paco-dialog-backdrop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: var(--paco-dialog-scrim); opacity: 0; transition: opacity 180ms ease; }
+:root .paco-dialog-backdrop.visible { opacity: 1; }
+:root .paco-dialog-title { margin: 0 0 var(--paco-space-3); font: 400 var(--paco-text-dialog-title)/1.3 var(--font-display); letter-spacing: -.02em; }
+:root .paco-dialog-description { margin: 0 0 var(--paco-space-4); font-size: var(--paco-text-body); color: var(--ds-muted); }
+:root .paco-dialog-actions { display: flex; justify-content: flex-end; gap: var(--paco-space-2); margin: var(--paco-space-6) 0 0; }
+:root .paco-dialog-prose h3 { font: 500 var(--paco-text-supporting)/1.5 var(--font-body); margin: var(--paco-space-6) 0 var(--paco-space-2); }
+:root .paco-dialog-prose blockquote { padding: var(--paco-space-3) var(--paco-space-4); margin: 0; border-left: 2px solid var(--ds-border); font-size: var(--paco-text-supporting); color: var(--ds-muted); }
+
+:root .paco-loading-state { padding: var(--paco-space-6) var(--paco-space-4); color: var(--ds-muted); font-size: var(--paco-text-supporting); }
+:root :is(.paco-skeleton-label,.paco-skeleton-line,.paco-skeleton-pill) { background: var(--paco-skeleton-fill); border-radius: var(--paco-radius-skeleton); animation: paco-loading 1.4s ease-in-out infinite alternate; }
+:root .paco-skeleton-label { height: 12px; }
+:root .paco-skeleton-line { height: 12px; }
+:root .paco-skeleton-pill { width: 52px; height: 32px; border-radius: var(--ds-action-radius); }
+@keyframes paco-loading { to { opacity: .45; } }
+@media(prefers-reduced-motion:reduce) {
+  :root .paco-dialog-backdrop { transition: none; }
+  :root :is(.paco-skeleton-label,.paco-skeleton-line,.paco-skeleton-pill) { animation: none; }
+}
+@media(max-width:480px) {
+  :root .paco-provider-mark { --paco-provider-size: 36px; --paco-radius-mark: 10px; }
+}
+
+:root .paco-page-title { display: block; font: 400 var(--paco-text-title)/1.2 var(--font-display); letter-spacing: -.025em; }
+:root .paco-leading-icon { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; color: var(--ds-muted); }
+:root .paco-leading-icon svg { width: 20px; height: 20px; }
+:root .paco-badge.with-dot::before { content: ''; width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; background: currentColor; }
+
+/* List cells extracted from catalog list rows, with one native hit target. */
+:root .paco-clickable-row { width: 100%; text-align: left; background: transparent; cursor: pointer; touch-action: manipulation; }
+:root .paco-clickable-row:disabled { opacity: .45; cursor: default; }
+:root .paco-clickable-row:focus-visible { outline: 2px solid var(--theme-action-accent); outline-offset: -2px; }
+@media(hover:hover) and (pointer:fine) {
+  :root .paco-clickable-row:hover:not(:disabled) { background: var(--control-hover-bg); }
+}
+:root .paco-clickable-row:active:not(:disabled) { background: var(--control-pressed-bg); }
+:root .paco-cell-copy { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+:root .paco-cell-copy > * { margin: 0; }
+:root .paco-row:has(.paco-cell-copy) { padding-block: 10px; }
+:root .paco-cell-title { font: 500 var(--paco-text-body)/1.4 var(--font-body); overflow-wrap: anywhere; }
+:root .paco-text-supporting { font: 400 var(--paco-text-supporting)/1.5 var(--font-body); color: var(--ds-muted); overflow-wrap: anywhere; }
+:root .paco-cell-copy > .paco-text-supporting { line-height: 1.4; }
+:root .paco-row-chevron { width: 20px; height: 20px; flex: none; color: var(--ds-muted); }
+:root .paco-tone-danger { color: var(--theme-danger); }
+
+/* Short tasks float at the center of the trick viewport on every device.
+   Keep all four edges clear of host chrome, including the mobile composer. */
+:root .paco-sheet { max-width: none; padding: 24px; border-radius: 20px; box-shadow: 0 12px 36px rgb(0 0 0 / 14%); overscroll-behavior: contain; }
+:root .paco-sheet-header { display: flex; justify-content: flex-end; margin: -8px -8px 12px 0; }
+
+
+/* Wrapping actions keep long labels and enlarged text inside narrow cells. */
+:root .paco-button.wrap { min-width: 0; white-space: normal; overflow-wrap: anywhere; text-align: left; }
+
+/* Primary prose uses the same scalable body role as controls and cells. */
+:root .paco-text-body { font: 400 var(--paco-text-body)/1.5 var(--font-body); color: var(--theme-text); overflow-wrap: anywhere; }
+
+/* Programmatic page-entry focus announces the heading without a control ring. */
+:root .paco-page-title[tabindex="-1"]:focus { outline: none; }
+
+/* Shared detail-page navigation, extracted from Invite's toolbar. */
+:root .paco-page-toolbar { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--paco-space-4); margin: -12px 0 var(--paco-space-6); }
+
+/* Suggested additions are separate, outlined surfaces rather than owned rows. */
+:root .paco-suggestion-card { background: var(--theme-surface); border: 1px dashed var(--form-edge); border-radius: var(--paco-radius-group); }
+@media(hover:hover) and (pointer:fine) {
+  :root .paco-suggestion-card:has(.row-action:hover:not(:disabled)) { background: color-mix(in srgb, var(--theme-action-accent) 6%, var(--theme-surface)); }
+}
+:root .paco-suggestion-card:has(.row-action:active:not(:disabled)) { background: var(--control-pressed-bg); }
+:root .paco-suggestion-card + .paco-suggestion-card::before { content: none; }
+
+/* Muted cells stay interactive and retain readable supporting-text contrast. */
+:root .paco-tone-muted, :root .paco-muted-cell :is(.paco-cell-title,.paco-text-body) { color: var(--ds-muted); }
+
+/* Align a leading status marker with the first line of a cell's title. */
+:root .paco-status-dot.title-aligned { align-self: flex-start; margin-top: calc((var(--paco-text-body) * 1.4 - .5rem) / 2); }
+
+/* Inactive markers are intentionally paler than muted, readable text. */
+:root .paco-tone-inactive { color: var(--paco-status-inactive); }
+
+/* A native full-card button can include an inline action label, not a nested control. */
+:root .paco-clickable-row > .row-action { pointer-events: none; flex: none; }
+@media(hover:hover) and (pointer:fine) {
+  :root .paco-suggestion-card.paco-clickable-row:hover:not(:disabled) { background: color-mix(in srgb, var(--theme-action-accent) 6%, var(--theme-surface)); }
+}
+:root .paco-suggestion-card.paco-clickable-row:active:not(:disabled) { background: var(--control-pressed-bg); }
+
+/* Compact alerts, including legacy alertdialog surfaces. */
+:root .paco-dialog:is(.paco-alert,[role="alertdialog"]) { transform: none; inset: 0; margin: auto; width: min(360px, calc(100vw - 32px)); padding: 24px; border-radius: var(--paco-radius-dialog); }
+:root .paco-dialog:is(.paco-alert,[role="alertdialog"]) .paco-dialog-description { color: var(--theme-text); }
+:root .paco-dialog:is(.paco-alert,[role="alertdialog"]) .paco-dialog-actions { flex-direction: row; flex-wrap: wrap; }
+:root .paco-dialog:is(.paco-alert,[role="alertdialog"]) .paco-dialog-actions > .paco-button { flex: 1 1 120px; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+/* Phone alerts give each action a full row, with the primary choice first. */
+@media(max-width:600px) {
+  :root .paco-dialog:is(.paco-alert,[role="alertdialog"]) .paco-dialog-actions { flex-direction: column; flex-wrap: nowrap; }
+  :root .paco-dialog:is(.paco-alert,[role="alertdialog"]) .paco-dialog-actions > .paco-button { flex: none; width: 100%; }
+  :root .paco-dialog:is(.paco-alert,[role="alertdialog"]) .paco-dialog-actions > :is(.primary,.danger) { order: -1; }
+}
+/* Short editing tasks use a quieter frame and clearly bounded fields. */
+:root .paco-sheet .paco-field { border: 1px solid var(--theme-border); border-radius: 12px; }
+:root .paco-sheet .paco-dialog-actions { margin-top: 16px; }
+:root .paco-sheet:not(.paco-action-sheet) .paco-dialog-actions > .paco-button { min-width: 96px; }
+/* Action choices reuse pill geometry with equal secondary emphasis. */
+:root .paco-action-sheet { width: min(360px, calc(100vw - 32px)); }
+:root .paco-action-sheet .paco-dialog-actions { flex-direction: column; }
+:root .paco-action-sheet .paco-dialog-actions > .paco-button { width: 100%; white-space: normal; overflow-wrap: anywhere; }
+:root .paco-dialog .paco-dialog-actions > .paco-button.ghost,
+:root .paco-action-sheet .paco-dialog-actions > .paco-button { border-color: var(--theme-border); background: var(--entry-fill); color: var(--theme-text); }
+:root .paco-action-sheet .paco-dialog-actions > .paco-button.danger { color: var(--theme-danger); }
+:root .paco-dialog .paco-dialog-actions > .paco-button.ghost:hover,
+:root .paco-action-sheet .paco-dialog-actions > .paco-button:hover { background: var(--control-hover-bg); }
+:root .paco-dialog .paco-dialog-actions > .paco-button.ghost:active,
+:root .paco-action-sheet .paco-dialog-actions > .paco-button:active { background: var(--control-pressed-bg); }
+
+/* Segmented control extracted from the catalog's liquid-segments specimen. */
+:root .paco-segments { position: relative; isolation: isolate; display: flex; width: 100%; overflow-x: auto; padding: 4px; gap: 2px; border-radius: 999px; background: var(--entry-fill); }
+:root .paco-segments > button { flex: 1 0 auto; min-width: max-content; min-height: 44px; margin: 0; padding: 10px 14px; border: 0; border-radius: 999px; background: transparent; box-shadow: none; color: var(--ds-muted); font: 500 var(--paco-text-body)/1.4 var(--font-body); cursor: pointer; overflow-wrap: anywhere; }
+:root .paco-segments > button:is([aria-selected=true], [aria-pressed=true]) { background: var(--paco-segment-selection); color: var(--theme-text); font-weight: 600; }
+:root .paco-segments > button:active { transform: none; }
+:root :is(.paco-segments > button,.paco-avatar):focus-visible { outline: 2px solid var(--theme-action-accent); outline-offset: 2px; }
+/* Only the moving lens paints selection; pointer states never add another pill. */
+:root .paco-segments > button:not([aria-selected=true], [aria-pressed=true]):is(:hover,:active),
+:root .paco-segments.has-paco-lens > button:is(:hover,:active) { background: transparent; box-shadow: none; }
+:root .paco-avatar { width: 76px; height: 76px; flex: 0 0 76px; border-radius: var(--paco-radius-group); overflow: hidden; background: var(--theme-surface); border: 1px solid var(--ds-border); cursor: zoom-in; }
+:root .paco-avatar > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+:root .paco-avatar:active { opacity: .8; }
+:root .paco-empty-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--ds-muted); }
+:root .paco-empty-icon svg { width: 28px; height: 28px; }
+:root .paco-modal { position: fixed; inset: 50% auto auto 50%; transform: translate(-50%, -50%); margin: 0; z-index: 1002; }
+:root .paco-modal-scrim { position: fixed; inset: 0; z-index: 1001; background: var(--paco-dialog-scrim); }
+:root :is(.paco-modal,.paco-modal-scrim)[hidden] { display: none; }
+:root .paco-modal .paco-dialog-actions { flex-direction: column; }
+:root .paco-modal .paco-button { white-space: normal; }
+:root .paco-break-text { overflow-wrap: anywhere; }
+:root .paco-disclosure-list { padding-left: 20px; margin: 0 0 16px; font: inherit; list-style: disc; }
+
+:root { --paco-segment-selection: var(--theme-surface); }
+:root .paco-segment-lens { position: absolute; left: 0; z-index: 0; pointer-events: none; border-radius: 999px; background: var(--paco-segment-selection); visibility: hidden; }
+:root .paco-segments.has-paco-lens > .paco-segment-lens { visibility: visible; }
+:root .paco-segments > button { position: relative; z-index: 1; }
+:root .paco-segments.has-paco-lens > button[aria-selected=true] { background: transparent; }
+:root .paco-media-tile { aspect-ratio: 1; min-width: 0; overflow: hidden; border-radius: var(--paco-radius-group); cursor: pointer; }
+:root .paco-media-tile > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+:root .paco-media-tile:active { opacity: .75; }
+
+/* Contextual action menu, extracted from the proposal's liquid-menu. */
+:root .paco-menu {
+  position: fixed; margin: 0; width: 240px; max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 24px); overflow: auto; padding: 6px;
+  border: 1px solid var(--presentation-edge); border-radius: var(--paco-radius-group);
+  background: var(--liquid-sheen), color-mix(in srgb, var(--presentation-fill) 94%, transparent);
+  color: var(--theme-text); box-shadow: var(--liquid-inset), var(--liquid-shadow);
+  backdrop-filter: blur(20px) saturate(1.15); -webkit-backdrop-filter: blur(20px) saturate(1.15);
+}
+:root .paco-menu::backdrop { background: transparent; }
+:root .paco-menu-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px;
+  padding: 12px 14px; border: 0; border-radius: var(--paco-radius-field);
+  background: transparent; color: var(--theme-text); text-align: left;
+  font: 400 var(--paco-text-body)/1.4 var(--font-body); cursor: pointer;
+  overflow-wrap: anywhere; touch-action: manipulation;
+}
+:root .paco-menu-item > svg { width: 20px; height: 20px; flex: 0 0 20px; }
+:root .paco-menu-item.destructive { color: var(--theme-danger); }
+:root .paco-menu-item:disabled { opacity: .45; cursor: default; }
+:root .paco-menu-item:focus-visible { outline: 2px solid var(--theme-action-accent); outline-offset: -2px; background: var(--control-hover-bg); }
+:root .paco-menu-item:active:not(:disabled) { background: var(--control-pressed-bg); transform: none; }
+:root .paco-menu-separator { height: 1px; margin: 6px 8px; background: var(--ds-border); }
+:root .paco-menu-backdrop { position: fixed; inset: 0; background: transparent; }
+@media (hover:hover) and (pointer:fine) { :root .paco-menu-item:hover:not(:disabled) { background: var(--control-hover-bg); } }
+@media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
+  :root .paco-menu { background: var(--presentation-fill); border-color: var(--theme-text); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* Three-column media group: soften the perimeter, tighten adjoining corners. */
+:root .paco-media-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--paco-space-2); --paco-media-inner-radius: 4px; }
+:root .paco-media-grid > .paco-media-tile:not(:nth-child(3n)):not(:last-child) { border-top-right-radius: var(--paco-media-inner-radius); border-bottom-right-radius: var(--paco-media-inner-radius); }
+:root .paco-media-grid > .paco-media-tile:not(:nth-child(3n + 1)) { border-top-left-radius: var(--paco-media-inner-radius); border-bottom-left-radius: var(--paco-media-inner-radius); }
+:root .paco-media-grid > .paco-media-tile:nth-child(n + 4) { border-top-left-radius: var(--paco-media-inner-radius); border-top-right-radius: var(--paco-media-inner-radius); }
+:root .paco-media-grid > .paco-media-tile:nth-last-child(n + 4) { border-bottom-left-radius: var(--paco-media-inner-radius); border-bottom-right-radius: var(--paco-media-inner-radius); }
+
+/* One grouped surface: only the outside corners round, including on hover. */
+:root .paco-cell-list { display: flex; flex-direction: column; background: var(--entry-fill); border-radius: var(--paco-radius-group); overflow: hidden; }
+:root .paco-cell-list > .paco-row { border-radius: 0; }
+
+/* Compact category filters: 32px pills inside a 44px touch target. */
+:root .paco-filter-chip {
+  position: relative; isolation: isolate; display: inline-flex; align-items: center;
+  justify-content: center; flex: 0 0 auto; min-height: 44px; padding: 6px 12px;
+  border: 0; border-radius: 999px; background: transparent; color: var(--ds-muted);
+  font: 500 var(--paco-text-supporting)/1.4 var(--font-body); white-space: nowrap;
+  cursor: pointer; touch-action: manipulation;
+}
+:root .paco-filter-chip::before {
+  content: ''; position: absolute; z-index: -1; inset: 6px 0; border-radius: inherit;
+  background: var(--entry-fill); border: 1px solid var(--ds-border);
+}
+:root .paco-filter-chip[aria-pressed=true] { color: var(--theme-action-fg); }
+:root .paco-filter-chip[aria-pressed=true]::before { background: var(--theme-action); border-color: transparent; }
+:root .paco-filter-chip:focus-visible { outline: none; }
+:root .paco-filter-chip:focus-visible::before { outline: 2px solid var(--form-focus); outline-offset: 2px; }
+@media (hover:hover) and (pointer:fine) {
+  :root .paco-filter-chip:not([aria-pressed=true]):hover::before { background: var(--control-hover-bg); }
+}
+:root .paco-filter-chip:active::before { opacity: .8; }
+
+/* Message reactions share the contextual menu material and use 44px targets. */
+:root .paco-menu.paco-reaction-picker {
+  display: flex; align-items: center; gap: 0;
+  width: max-content; padding: var(--paco-space-1);
+  border-radius: var(--ds-action-radius);
+}
+:root .paco-reaction-picker .rx-picker-btn {
+  width: 44px; height: 44px; flex: 0 0 44px;
+  border-radius: var(--ds-action-radius);
+}
+:root .paco-reaction-picker .rx-picker-btn--mine {
+  background: var(--control-selected-bg);
+}
+:root .paco-reaction-picker .rx-picker-btn:focus-visible {
+  outline: 2px solid var(--theme-action-accent); outline-offset: -2px;
+}
+:root .paco-reaction-picker .rx-picker-btn:active {
+  background: var(--control-pressed-bg);
+}
+@media (hover:hover) and (pointer:fine) {
+  :root .paco-reaction-picker .rx-picker-btn:hover { background: var(--control-hover-bg); }
+}

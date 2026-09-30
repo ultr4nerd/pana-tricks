@@ -1,0 +1,63 @@
+{
+  "id": "com.mauricio.super-compartido",
+  "name": "Súper compartido",
+  "version": "0.1.0",
+  "icon": "hugeicons:shopping-cart-02",
+  "app_support_dir": "com.mauricio.super-compartido",
+  "color": "watercolor",
+  "description": "Lista de súper compartida entre dos o más Panas, con código para unirse",
+  "source": "https://github.com/ultr4nerd/pana-tricks",
+  "events": {
+    "create_list": {
+      "schema": {
+        "name": "string"
+      },
+      "handler": "scripts/on_create.sh"
+    },
+    "join_list": {
+      "schema": {
+        "code": "string"
+      },
+      "handler": "scripts/on_join.sh"
+    },
+    "leave_list": {
+      "schema": {},
+      "handler": "scripts/on_leave.sh"
+    },
+    "rename_list": {
+      "schema": {
+        "name": "string"
+      },
+      "handler": "scripts/on_rename.sh"
+    },
+    "add_item": {
+      "schema": {
+        "name": "string"
+      },
+      "handler": "scripts/on_add.sh"
+    },
+    "toggle_item": {
+      "schema": {
+        "id": "integer"
+      },
+      "handler": "scripts/on_toggle.sh"
+    },
+    "delete_item": {
+      "schema": {
+        "id": "integer"
+      },
+      "handler": "scripts/on_delete.sh"
+    },
+    "clear_checked": {
+      "schema": {},
+      "handler": "scripts/on_clear_checked.sh"
+    }
+  },
+  "queries": {
+    "list": {
+      "params": {},
+      "handler": "scripts/query_list.sh",
+      "returns": "object"
+    }
+  }
+}

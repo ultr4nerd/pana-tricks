@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Súper compartido</title>
+<script>
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light';
+}
+(function bootTheme() {
+  let theme = new URLSearchParams(location.search).get('theme');
+  if (theme !== 'light' && theme !== 'dark') {
+    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  applyTheme(theme);
+  window.addEventListener('message', event => {
+    if (event.source === parent && event.data && event.data.type === 'pana:theme') {
+      applyTheme(event.data.theme);
+    }
+  });
+  parent.postMessage({ type: 'pana:theme-request' }, '*');
+})();
+</script>
+<style data-trick-fonts>
+@font-face {
+  font-family: 'Zodiak';
+  src:url('{{CP_BASE_URL}}/sdk/zodiak-400-normal.woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Zodiak';
+  src:url('{{CP_BASE_URL}}/sdk/zodiak-400-italic.woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Zodiak';
+  src:url('{{CP_BASE_URL}}/sdk/zodiak-700-normal.woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:url('{{CP_BASE_URL}}/sdk/inter-400-normal.ttf');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:url('{{CP_BASE_URL}}/sdk/inter-500-normal.ttf');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src:url('{{CP_BASE_URL}}/sdk/inter-600-normal.ttf');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:url('{{CP_BASE_URL}}/sdk/jetbrains-mono-400-normal.ttf');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:url('{{CP_BASE_URL}}/sdk/jetbrains-mono-500-normal.ttf');
+}
+</style>
+  <link rel="stylesheet" href="design/theme.css">
+  <script src="design/components.js"></script>
+  <style>
+    :root { --gap: 16px; }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; }
+    body { background: var(--theme-bg); color: var(--theme-text); font-family: var(--font-body); font-size: 15px; line-height: 1.4; }
+    main { max-width: 640px; margin: 0 auto; padding: var(--gap) var(--gap) 96px; box-sizing: border-box; }
+    header { display: flex; align-items: center; gap: 8px; margin-bottom: var(--gap); }
+    header h1 { flex: 1; margin: 0; font-family: var(--font-display, 'Zodiak'), serif; font-weight: 400; font-size: 24px; min-width: 0; overflow-wrap: anywhere; }
+    .sync { font-size: 12px; color: var(--theme-text-muted); }
+    form.add { display: flex; gap: 8px; margin-bottom: var(--gap); }
+    form.add .paco-field, .onb .paco-field { flex: 1; min-width: 0; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { position: relative; overflow: hidden; border-bottom: 1px solid var(--theme-border, rgba(127,127,127,.2)); }
+    .row { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; padding: 12px 4px; background: var(--theme-bg); transition: transform .15s; touch-action: pan-y; cursor: pointer; user-select: none; }
+    .box { width: 20px; height: 20px; flex: none; border-radius: 50%; border: 1.5px solid var(--theme-text-muted); display: grid; place-items: center; box-sizing: border-box; }
+    .done .box { background: var(--theme-text-muted); border-color: var(--theme-text-muted); }
+    .done .box::after { content: ""; width: 5px; height: 9px; border: solid var(--theme-bg); border-width: 0 2px 2px 0; transform: translateY(-1px) rotate(45deg); }
+    .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .done .name { color: var(--theme-text-muted); text-decoration: line-through; }
+    .done .row { opacity: .6; }
+    .trash { background: none; border: 0; color: var(--theme-text-muted); padding: 6px; cursor: pointer; flex: none; line-height: 0; }
+    .del-bg { position: absolute; inset: 0; background: var(--theme-danger, #c0392b); color: #fff; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; font-size: 13px; }
+    .empty, .muted { color: var(--theme-text-muted); }
+    .empty { text-align: center; padding: 40px 0; }
+    .foot { margin-top: var(--gap); display: flex; justify-content: center; }
+    .onb { display: grid; gap: 24px; padding-top: 8px; }
+    .onb h1 { font-family: var(--font-display, 'Zodiak'), serif; font-weight: 400; font-size: 28px; margin: 0; }
+    .onb p { margin: 0; }
+    .onb form { display: flex; gap: 8px; }
+    .onb h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px; color: var(--theme-text-muted); }
+    .err { color: var(--theme-danger, #c0392b); font-size: 13px; min-height: 1em; }
+    .share { border: 1px solid var(--theme-border, rgba(127,127,127,.25)); border-radius: 12px; padding: 14px; margin-bottom: var(--gap); display: grid; gap: 10px; }
+    .code { font-family: 'JetBrains Mono', monospace; font-size: 13px; word-break: break-all; padding: 10px; border-radius: 8px; background: var(--theme-surface, rgba(127,127,127,.1)); user-select: all; }
+    .share .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="onb" id="onb" hidden>
+    <div><h1>Súper compartido</h1><p class="muted">Una lista que editan varias personas, cada quien desde su Pana.</p></div>
+    <div><h2>Crear una lista</h2>
+      <form id="fc"><input class="paco-field" id="cname" placeholder="Nombre (ej. Súper de la casa)" autocomplete="off"><button class="paco-button primary" type="submit">Crear</button></form></div>
+    <div><h2>Unirme a una lista</h2>
+      <form id="fj"><input class="paco-field" id="jcode" placeholder="Pega el código que te compartieron" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="paco-button" type="submit">Unirme</button></form></div>
+    <p class="err" id="oerr"></p>
+  </section>
+  <section id="app" hidden>
+    <header><h1 id="title">Súper</h1><span class="sync" id="sync"></span>
+      <button class="paco-button ghost" id="shareBtn" type="button">Compartir</button></header>
+    <div class="share" id="share" hidden>
+      <p class="muted" style="margin:0">Quien tenga este código puede ver y editar la lista. Pídele que abra Súper compartido en su Pana y lo pegue en «Unirme».</p>
+      <div class="code" id="code"></div>
+      <div class="btns"><button class="paco-button" id="copy" type="button">Copiar código</button>
+        <button class="paco-button ghost" id="leave" type="button">Salir de esta lista</button></div>
+    </div>
+    <form class="add" id="f">
+      <input class="paco-field" id="q" placeholder="Agregar artículo…" autocomplete="off" enterkeyhint="done">
+      <button class="paco-button primary" type="submit" data-paco-haptic="press">Agregar</button>
+    </form>
+    <ul id="list"></ul>
+    <p class="empty" id="empty" hidden>La lista está vacía.</p>
+    <div class="foot"><button class="paco-button ghost" id="clear" type="button" hidden>Limpiar comprados</button></div>
+  </section>
+</main>
+<script type="module">
+import { Trick } from '{{CP_BASE_URL}}/sdk/trick.v3.js';
+const trick = Trick({ id: 'com.mauricio.super-compartido' });
+let items = [], code = '', pending = 0, seq = 0;
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TRASH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+function sorted() { return [...items].sort((a,b) => (a.checked - b.checked) || (b.created_at > a.created_at ? 1 : b.created_at < a.created_at ? -1 : b.id - a.id)); }
+function render() {
+  const l = sorted();
+  $('list').innerHTML = l.map(i => `<li class="${i.checked ? 'done' : ''}" data-id="${i.id}"><div class="del-bg">Eliminar</div><div class="row"><span class="box"></span><span class="name">${esc(i.name)}</span><button class="trash" aria-label="Eliminar">${TRASH}</button></div></li>`).join('');
+  $('empty').hidden = l.length > 0;
+  $('clear').hidden = !l.some(i => i.checked);
+}
+function apply(r) {
+  if (!r) return;
+  if (r.configured === false) { $('app').hidden = true; $('onb').hidden = false; return; }
+  if (!r.ok) { $('sync').textContent = r.error === 'offline' ? 'Sin conexión' : ''; return; }
+  $('onb').hidden = true; $('app').hidden = false; $('sync').textContent = '';
+  $('title').textContent = r.name || 'Súper'; code = r.code || ''; $('code').textContent = code;
+  items = r.items || []; render();
+}
+async function load() {
+  const my = ++seq;
+  try { const r = await trick.query('list'); if (my === seq && !pending) apply(r); } catch (e) {}
+}
+async function act(ev, p) { pending++; try { await trick.sendEvent(ev, p); } catch (e) {} pending--; load(); }
+// polling: pausa con un input enfocado, pestaña oculta, gesto en curso o escritura pendiente
+const typing = () => { const a = document.activeElement; return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA'); };
+let swiping = false;
+setInterval(() => { if (!document.hidden && !typing() && !swiping && !pending) load(); }, 4000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !typing()) load(); });
+document.addEventListener('focusout', () => setTimeout(() => { if (!typing()) load(); }, 50));
+
+$('fc').addEventListener('submit', async e => { e.preventDefault(); $('oerr').textContent = '';
+  await act('create_list', { name: $('cname').value.trim() || 'Súper' }); $('cname').value = ''; });
+$('fj').addEventListener('submit', async e => { e.preventDefault(); const c = $('jcode').value.trim(); if (!c) return;
+  $('oerr').textContent = ''; pending++;
+  try { await trick.sendEvent('join_list', { code: c }); } catch (e) {}
+  pending--; const r = await trick.query('list');
+  if (r && r.configured === false) $('oerr').textContent = 'Ese código no abre ninguna lista. Revisa que esté completo.';
+  else { $('jcode').value = ''; apply(r); } });
+$('shareBtn').onclick = () => { $('share').hidden = !$('share').hidden; };
+$('copy').onclick = async () => { try { await navigator.clipboard.writeText(code); $('copy').textContent = 'Copiado'; } catch (e) { const s = getSelection(), rg = document.createRange(); rg.selectNodeContents($('code')); s.removeAllRanges(); s.addRange(rg); } setTimeout(() => $('copy').textContent = 'Copiar código', 1500); };
+$('leave').onclick = () => { if (confirm('¿Salir de esta lista? La lista sigue existiendo para los demás; para volver necesitas el código.')) { $('share').hidden = true; act('leave_list', {}); } };
+
+$('f').addEventListener('submit', e => {
+  e.preventDefault(); const n = $('q').value.trim(); if (!n) return;
+  $('q').value = ''; items.push({ id: 1e12, name: n, checked: false, created_at: new Date().toISOString() }); render();
+  act('add_item', { name: n });
+});
+$('clear').onclick = () => { items = items.filter(i => !i.checked); render(); act('clear_checked', {}); };
+function del(id) { items = items.filter(i => i.id !== id); render(); act('delete_item', { id }); }
+$('list').addEventListener('click', e => {
+  const li = e.target.closest('li'); if (!li) return; const id = +li.dataset.id;
+  if (e.target.closest('.trash')) return del(id);
+  const it = items.find(i => i.id === id); if (!it) return;
+  it.checked = !it.checked; render(); act('toggle_item', { id });
+});
+let sx = null, sy = 0, row = null, dx = 0;
+$('list').addEventListener('touchstart', e => { row = e.target.closest('.row'); if (!row) return; swiping = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; row.style.transition = 'none'; }, { passive: true });
+$('list').addEventListener('touchmove', e => { if (sx === null || !row) return; dx = Math.min(0, e.touches[0].clientX - sx); if (Math.abs(e.touches[0].clientY - sy) > Math.abs(dx)) dx = 0; row.style.transform = `translateX(${dx}px)`; }, { passive: true });
+$('list').addEventListener('touchend', e => {
+  swiping = false; if (!row) return; row.style.transition = '';
+  if (dx < -100) { e.preventDefault(); del(+row.closest('li').dataset.id); } else row.style.transform = '';
+  sx = null; row = null;
+});
+load();
+</script>
+</body>
+</html>

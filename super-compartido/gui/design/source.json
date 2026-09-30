@@ -1,0 +1,15 @@
+{
+  "description": "Creation-time snapshot; upgrade only on explicit request. Fonts remain hosted.",
+  "sha256": {
+    "theme.v1.css": "2657af99abbeeb31e13f3a6bf46bcec92c25077e836aaaebd969cd3232ebed27",
+    "components.v1.js": "68ae18d8e634d7de38a77a5e738f430dbf29c8d8242b25ae7c55eced6e625df1",
+    "zodiak-400-normal.woff2": "81bf124d17416df8fb656393c46fb34bb74e5d472f07cec9ab295269f372098a",
+    "zodiak-400-italic.woff2": "63af701809888107dcb1d97912db01f713602b83f58b86a67ec404675f8ed0dd",
+    "zodiak-700-normal.woff2": "3a16318ca591672ee20514090d5f449bca74b2c02d6f508d9eefcea10140ce6c",
+    "inter-400-normal.ttf": "1b08e7fc267a5c7e1d614100f604b83e7e8a0be241f0f288faa2b3ac93a683ba",
+    "inter-500-normal.ttf": "8c883f63b2c4157d997319f2c8bc6995ed4357ef371940d31ca159004a4aae63",
+    "inter-600-normal.ttf": "e7a1aaf7eda9f2fad4131725fa556265ec75ca7b2d756260173a040363e8d4f7",
+    "jetbrains-mono-400-normal.ttf": "44ce4a84f20d60f24539bd0cef11f79c29e38609e0f8adf18551c9794a5d9dc3",
+    "jetbrains-mono-500-normal.ttf": "3386a05f6ece969e4537de6be894170d20558e82f7d56c8c5d332972ef172160"
+  }
+}
